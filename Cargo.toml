@@ -6,3 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4.19"                   # Date and time library for Rust
+csv = "1.1.6"                    # Fast CSV parsing with support for serde.
