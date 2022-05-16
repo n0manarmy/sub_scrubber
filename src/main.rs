@@ -1,4 +1,5 @@
-mod transaction;
+pub mod transaction;
+mod transaction_search;
 mod importers;
 mod utils;
 
@@ -8,15 +9,21 @@ mod prelude {
     pub use std::path::Path;
     pub use std::error::Error;
     pub use regex::Regex;
+    // pub use serde::{Serialize, Deserialize};
     pub use std::collections::hash_map::DefaultHasher;
+    pub use std::collections::HashMap;
     pub use std::hash::{Hash, Hasher};
+    pub use uuid::Uuid;
 
-    use crate::transaction;
+    pub use crate::transaction;
+    pub use crate::transaction::Transaction;
+    pub use crate::importers::bank_of_america_excel_import;
     
     pub use crate::utils::*;
     pub use crate::importers::{
         csv_importer, 
         regex_cleaner,
+        statement_loader,
     };
 }
 

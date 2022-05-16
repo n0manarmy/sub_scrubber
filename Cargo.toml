@@ -9,3 +9,14 @@ edition = "2021"
 chrono = "0.4.19"                   # Date and time library for Rust
 csv = "1.1.6"                    # Fast CSV parsing with support for serde.
 regex = "1.5.5"               # An implementation of regular expressions for Rust. This implementation uses finite automata and g…
+
+# serde = { version="1.0.137", features=["derive"] }                       # A generic serialization/deserialization framework
+# serde_json = "1.0.81"                   # A JSON serialization file format
+
+[dependencies.uuid]
+version = "1.0.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]

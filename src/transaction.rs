@@ -1,20 +1,27 @@
  use crate::prelude::*;
 
-#[derive(Debug, PartialEq)]
+ #[derive(Debug, PartialEq, Clone)]
 pub struct Transaction {
+    pub uuid: Uuid,
     pub date: NaiveDate,
     pub description: String,
     pub amount: f64,
+    pub hash: u64,
 }
 
 impl Transaction {
 
     pub fn new(date: NaiveDate, description: String, amount: f64) -> Self {
-        Self {
+        let mut trans = Self {
+            uuid: Uuid::new_v4(), 
             date,
             description,
             amount,
-        }
+            hash: 0,
+        };
+        trans.hash = transaction::calculate_hash(&trans);
+
+        trans
     }
 
     fn get_cleaned_desc(&self) -> String {
@@ -24,6 +31,13 @@ impl Transaction {
         }
     }
 }
+
+fn calculate_hash<T: Hash>(t: &T) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    t.hash(&mut hasher);
+    hasher.finish()
+}
+
 
 impl Hash for Transaction {
     
