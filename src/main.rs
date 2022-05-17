@@ -14,6 +14,7 @@ mod prelude {
     pub use std::collections::HashMap;
     pub use std::hash::{Hash, Hasher};
     pub use uuid::Uuid;
+    pub use base64::encode;
 
     pub use crate::transaction;
     pub use crate::transaction::Transaction;

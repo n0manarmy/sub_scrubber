@@ -6,7 +6,7 @@ pub struct Transaction {
     pub date: NaiveDate,
     pub description: String,
     pub amount: f64,
-    pub hash: u64,
+    pub hash: String,
 }
 
 impl Transaction {
@@ -17,9 +17,11 @@ impl Transaction {
             date,
             description,
             amount,
-            hash: 0,
+            hash: "".into(),
         };
-        trans.hash = transaction::calculate_hash(&trans);
+        // trans.hash = transaction::calculate_hash(&trans);
+        trans.hash = encode([trans.get_cleaned_desc(), trans.amount.to_string()].concat());
+        
 
         trans
     }

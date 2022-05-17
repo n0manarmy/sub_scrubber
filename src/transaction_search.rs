@@ -1,19 +1,34 @@
 use crate::prelude::*;
 
-pub fn find_duplicates(transactions: &Vec<Transaction>) -> HashMap<u64, (Transaction, usize)>{
+pub fn find_duplicates(transactions: &Vec<Transaction>) -> HashMap<String, (Transaction, usize)>{
 
-    let mut found: HashMap<u64, (Transaction, usize)> = HashMap::new();
+    // let mut found: HashMap<u64, (Transaction, usize)> = HashMap::new();
+    let mut found: HashMap<String, (Transaction, usize)> = HashMap::new();
+    let mut collected: HashMap<String, (Transaction, usize)> = HashMap::new();
     let mut transaction_pos = 0;
 
-    while transaction_pos < transactions.len() {
-        let transaction = &transactions[transaction_pos];
-        for t in transactions {
-            if (t.uuid != transaction.uuid) && (t.hash == transaction.hash) {
-                found.entry(transaction.hash).or_insert((transaction.clone(), 0)).1 += 1;
-            }
-        }
-        transaction_pos += 1;
+    for t in transactions {
+        collected.insert(t.hash.clone(), (t.clone(), 1));
     }
+
+    dbg!("collected size: {}", collected.len());
+    dbg!("transactions size: {}", transactions.len());
+
+    for t in transactions {
+        if collected.contains_key(&t.hash) {
+            collected.get_mut(&t.hash).unwrap().1 += 1;
+        }
+    }
+
+    // while transaction_pos < transactions.len() {
+    //     let transaction = &transactions[transaction_pos];
+    //     for t in transactions {
+    //         if (t.uuid != transaction.uuid) && (t.hash == transaction.hash) {
+    //             found.entry(transaction.hash.clone()).or_insert((transaction.clone(), 0)).1 += 1;
+    //         }
+    //     }
+    //     transaction_pos += 1;
+    // }
 
     // let dup = transactions.clone();
     // for d in dup {
@@ -31,7 +46,7 @@ pub fn find_duplicates(transactions: &Vec<Transaction>) -> HashMap<u64, (Transac
     //     }
     // }
 
-    found
+    collected
 }
 
 #[cfg(test)]
@@ -59,8 +74,8 @@ mod tests {
         let found = find_duplicates(&transactions);
 
         for (_, values) in found {
-            if values.1 > 25 {
-                println!("Amount: {}, Count {:.0}, Desc {}", values.0.amount, (values.1 as f64).sqrt(), values.0.description);
+            if values.1 > 5 {
+                println!("Amount: {}, Count {:.0}, Desc {}", values.0.amount, values.1, values.0.description);
             }
         }
     }
