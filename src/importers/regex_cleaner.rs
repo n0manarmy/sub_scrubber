@@ -16,6 +16,8 @@ mod tests {
         let test = "AMZ*The Washington P 04/10 PURCHASE help@washpost DC";
         let result = "AMZ*The Washington P PURCHASE help@washpost DC".to_string();
         
-        assert_eq!(result, remove_mm_slash_yy(test.into()).unwrap());
+        assert_eq!(&result, &remove_mm_slash_yy(test.into()).unwrap());
+        
+        dbg!(transaction::calculate_hash(&result));
     }
 }
