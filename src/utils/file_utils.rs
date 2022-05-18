@@ -1,9 +1,4 @@
-use std::io::prelude::*;
-use std::path::Path;
-use std::fs::File;
-use std::io::Read;
-use std::io;
-use std::fs::{self, DirEntry};
+use crate::prelude::*;
 
 /// # Usage
 /// takes a string line and the path to a log file and creates a new
@@ -54,6 +49,15 @@ fn visit_dirs(dir: &Path, cb: &dyn Fn(&DirEntry)) -> io::Result<()> {
     Ok(())
 }
 
+pub fn write_transactions_to_file_serde(transactions: Vec<Transaction>, outfile: String) -> std::io::Result<()> {
+    let mut file = File::create(outfile)?;
+    for t in transactions {
+        file.write_all(serde_json::to_string(&t).unwrap().as_bytes())?;
+    }
+
+    Ok(())
+}
+
 // check our log if it exists
 pub fn file_exists(path: &str) -> bool {
     Path::new(&path).exists()
@@ -81,8 +85,30 @@ mod tests {
 
     #[test]
     pub fn test_load_log_file() {
-        match load_file(Path::new("./statements/test.csv")) {
+        match load_file(Path::new("./test_files/test.csv")) {
             Ok(v) => println!("{}", v),
+            Err(why) => panic!("{}", why),
+        }
+    }
+
+    #[test]
+    pub fn test_serialize_transactions_to_file() {
+        let mut transactions: Vec<Transaction> = Vec::new();
+
+        let statements = std::path::Path::new("./statements");
+        dbg!("reading statement path");
+        let statement_load = statement_loader::load_statements(statements);
+        dbg!("loading statements");
+        for statement in statement_load {
+            let imported_statement: String = bank_of_america_excel_import::import(Path::new(&statement));
+            match csv_importer::import(imported_statement) {
+                Ok(mut v) => transactions.append(&mut v),
+                Err(why) => panic!("{}", why),
+            }
+        }
+
+        match write_transactions_to_file_serde(transactions, "./test_files/collected.json".to_string()) {
+            Ok(_) => (),
             Err(why) => panic!("{}", why),
         }
     }

@@ -13,11 +13,12 @@ mod tests {
     
     #[test]
     pub fn test_remove_mm_slash_yy() {
-        let test = "AMZ*The Washington P 04/10 PURCHASE help@washpost DC";
+        let test_desc = "AMZ*The Washington P 04/10 PURCHASE help@washpost DC";
+        let test_amount = 45.50;
         let result = "AMZ*The Washington P PURCHASE help@washpost DC".to_string();
         
-        assert_eq!(&result, &remove_mm_slash_yy(test.into()).unwrap());
+        assert_eq!(&result, &remove_mm_slash_yy(test_desc.into()).unwrap());
         
-        dbg!(transaction::calculate_hash(&result));
+        dbg!(transaction::calculate_hash(&result, &test_amount.to_string()));
     }
 }

@@ -1,11 +1,8 @@
 use crate::prelude::*;
 
-pub fn find_duplicates(transactions: &Vec<Transaction>) -> HashMap<String, (Transaction, usize)>{
+pub fn find_duplicates(transactions: &Vec<Transaction>) -> HashMap<u64, (Transaction, usize)>{
 
-    // let mut found: HashMap<u64, (Transaction, usize)> = HashMap::new();
-    let mut found: HashMap<String, (Transaction, usize)> = HashMap::new();
-    let mut collected: HashMap<String, (Transaction, usize)> = HashMap::new();
-    let mut transaction_pos = 0;
+    let mut collected: HashMap<u64, (Transaction, usize)> = HashMap::new();
 
     for t in transactions {
         collected.insert(t.hash.clone(), (t.clone(), 1));
@@ -75,7 +72,7 @@ mod tests {
 
         for (_, values) in found {
             if values.1 > 5 {
-                println!("Amount: {}, Count {:.0}, Desc {}", values.0.amount, values.1, values.0.description);
+                println!("Amount: {}, Count {:.0}, Desc {}", values.0.amount, values.1, values.0.desc);
             }
         }
     }
