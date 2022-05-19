@@ -5,7 +5,7 @@ pub fn find_duplicates(transactions: &Vec<Transaction>) -> HashMap<u64, (Transac
     let mut collected: HashMap<u64, (Transaction, usize)> = HashMap::new();
 
     for t in transactions {
-        collected.insert(t.hash.clone(), (t.clone(), 1));
+        collected.insert(t.hash.clone(), (t.clone(), 0));
     }
 
     dbg!("collected size: {}", collected.len());
@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     pub fn test_find_duplicates() {
-        let mut transactions: Vec<Transaction> = Vec::new();
+        let mut ledger: Ledger = Ledger::new();
 
         let statements = std::path::Path::new("./statements");
         dbg!("reading statement path");
@@ -62,17 +62,32 @@ mod tests {
         for statement in statement_load {
             let imported_statement: String = bank_of_america_excel_import::import(Path::new(&statement));
             match csv_importer::import(imported_statement) {
-                Ok(mut v) => transactions.append(&mut v),
+                Ok(mut v) => ledger.transactions.append(&mut v),
                 Err(why) => panic!("{}", why),
             }
         }
         dbg!("statement import complete");
 
-        let found = find_duplicates(&transactions);
+        let found = find_duplicates(&ledger.transactions);
 
         for (_, values) in found {
             if values.1 > 5 {
                 println!("Amount: {}, Count {:.0}, Desc {}", values.0.amount, values.1, values.0.desc);
+            }
+        }
+    }
+
+    #[test]
+    pub fn test_find_saved_ledger_duplicates() {
+        let saved_ledger = "./test_files/collected.json";
+        dbg!("reading statement path");
+        let  ledger: Ledger = file_utils::read_transactions_from_file_serde(saved_ledger).expect("Error loading saved ledger");
+        dbg!("loading statements");
+        let found: HashMap<u64, (Transaction, usize)> = find_duplicates(&ledger.transactions);
+
+        for (_, values) in found {
+            if values.1 > 3 && values.0.amount < 0.0 {
+                println!("Amount: ${}, Count {:.0}, Desc {}", values.0.amount, values.1, values.0.desc);
             }
         }
     }

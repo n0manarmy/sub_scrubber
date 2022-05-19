@@ -31,6 +31,20 @@ mod tests {
     }
 
     #[test]
+    pub fn test_import_search() {
+        let statement = std::path::Path::new("./statements/stmt.csv");
+        let imported_statement: String = bank_of_america_excel_import::import(statement);
+        let results = import(imported_statement).unwrap();
+        for r in results {
+            if r.desc.contains("NETFLIX") {
+                dbg!(r);
+            }
+        }
+        // dbg!(results);
+        // dbg!(results.get(0).hash());
+    }
+
+    #[test]
     pub fn test_bulk_import() {
         let mut transactions: Vec<Transaction> = Vec::new();
 
@@ -46,5 +60,27 @@ mod tests {
         
         
         dbg!(transactions.len());
+    }
+
+
+    #[test]
+    pub fn test_bulk_import_search() {
+        let mut transactions: Vec<Transaction> = Vec::new();
+
+        let statements = std::path::Path::new("./statements");
+        let statement_load = statement_loader::load_statements(statements);
+        for statement in statement_load {
+            let imported_statement: String = bank_of_america_excel_import::import(Path::new(&statement));
+            match import(imported_statement) {
+                Ok(mut v) => transactions.append(&mut v),
+                Err(why) => panic!("{}", why),
+            }
+        }
+        
+        for t in transactions {
+            if t.desc.contains("NETFLIX") {
+                dbg!(t);
+            }
+        }
     }
 }

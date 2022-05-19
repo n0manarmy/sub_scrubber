@@ -1,4 +1,5 @@
 pub mod transaction;
+pub mod ledger;
 mod transaction_search;
 mod importers;
 mod utils;
@@ -15,7 +16,8 @@ mod prelude {
     pub use std::fs::{self, DirEntry};
 
     pub use regex::Regex;
-    pub use serde::ser::{Serialize, Serializer, SerializeStruct};
+    pub use serde::ser::{Serializer, SerializeStruct};
+    pub use serde::{Deserialize, Serialize};
     pub use std::collections::hash_map::DefaultHasher;
     pub use std::collections::HashMap;
     pub use std::hash::{Hash, Hasher};
@@ -23,6 +25,7 @@ mod prelude {
     pub use base64::encode;
 
     pub use crate::transaction;
+    pub use crate::ledger::Ledger;
     pub use crate::transaction::Transaction;
     pub use crate::importers::bank_of_america_excel_import;
     

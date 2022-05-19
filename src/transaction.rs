@@ -1,5 +1,3 @@
-use serde::{Serialize, Deserialize};
-
 use crate::prelude::*;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -16,12 +14,10 @@ impl Transaction {
         let mut trans = Self {
             uuid: Uuid::new_v4().to_string(),
             date: date.to_string(),
-            desc: description.clone(),
+            desc: description.to_uppercase().clone(),
             amount,
-            hash: transaction::calculate_hash(&description, &amount.to_string()), // hash: "".into(),
+            hash: transaction::calculate_hash(&transaction::get_cleaned_desc(&description), &amount.to_string()), // hash: "".into(),
         };
-        // trans.hash = transaction::calculate_hash(&trans);
-        // trans.hash = encode([trans.get_cleaned_desc(), trans.amount.to_string()].concat());
 
         trans
     }
@@ -42,7 +38,7 @@ impl Transaction {
 //     }
 // }
 
-fn get_cleaned_desc(desc: String) -> String {
+fn get_cleaned_desc(desc: &str) -> String {
     match regex_cleaner::remove_mm_slash_yy(&desc) {
         Ok(v) => v,
         Err(why) => panic!("{}", why),

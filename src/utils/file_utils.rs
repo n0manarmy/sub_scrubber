@@ -49,13 +49,24 @@ fn visit_dirs(dir: &Path, cb: &dyn Fn(&DirEntry)) -> io::Result<()> {
     Ok(())
 }
 
-pub fn write_transactions_to_file_serde(transactions: Vec<Transaction>, outfile: String) -> std::io::Result<()> {
+pub fn write_transactions_to_file_serde(ledger: Ledger, outfile: String) -> std::io::Result<()> {
     let mut file = File::create(outfile)?;
-    for t in transactions {
-        file.write_all(serde_json::to_string(&t).unwrap().as_bytes())?;
-    }
+    // for t in transactions {
+    file.write_all(serde_json::to_string(&ledger).unwrap().as_bytes())?;
+    // }
 
     Ok(())
+}
+
+pub fn read_transactions_from_file_serde(infile: &str) -> std::io::Result<Ledger> {
+    let mut file = File::open(infile)?;
+    let mut buff = String::new();
+
+    file.read_to_string(&mut buff)?;
+    // dbg!(&buff);
+    let transactions: Ledger = serde_json::from_str(&mut buff)?;
+    
+    Ok(transactions)
 }
 
 // check our log if it exists
@@ -93,7 +104,7 @@ mod tests {
 
     #[test]
     pub fn test_serialize_transactions_to_file() {
-        let mut transactions: Vec<Transaction> = Vec::new();
+        let mut ledger: Ledger = Ledger::new();
 
         let statements = std::path::Path::new("./statements");
         dbg!("reading statement path");
@@ -102,14 +113,26 @@ mod tests {
         for statement in statement_load {
             let imported_statement: String = bank_of_america_excel_import::import(Path::new(&statement));
             match csv_importer::import(imported_statement) {
-                Ok(mut v) => transactions.append(&mut v),
+                Ok(mut v) => ledger.transactions.append(&mut v),
                 Err(why) => panic!("{}", why),
             }
         }
 
-        match write_transactions_to_file_serde(transactions, "./test_files/collected.json".to_string()) {
+        match write_transactions_to_file_serde(ledger, "./test_files/collected.json".to_string()) {
             Ok(_) => (),
             Err(why) => panic!("{}", why),
         }
+    }
+
+
+    #[test]
+    pub fn test_deserialize_transactions_from_file() {
+        let statements = "./test_files/collected.json";
+        let ledger: Ledger = match read_transactions_from_file_serde(statements) {
+            Ok(v) => v,
+            Err(why) => panic!("{}", why),
+        };
+
+        dbg!("{}", ledger.transactions.len());
     }
 }
